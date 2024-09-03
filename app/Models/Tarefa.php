@@ -33,6 +33,10 @@ class Tarefa extends Model
         'data_termino' => 'datetime',
     ];
 
+    public function prioridade(){
+        return $this->belongsTo(Prioridade::class);
+    }
+
     protected static function booted()
     {
         static::creating(function ($tarefa) {
