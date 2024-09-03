@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\TarefaResource\Pages;
 use App\Filament\Resources\TarefaResource\RelationManagers;
 use App\Models\Tarefa;
+use Auth;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -30,32 +31,40 @@ class TarefaResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-        ->schema([
-            TextInput::make('nome')
-                ->required()
-                ->minLength(5)
-                ->maxLength(50),
-            Textarea::make('descricao')
-                ->maxLength(140)
-                ->nullable(),
-            DateTimePicker::make('data_termino')
-                ->nullable()
-                ->disabled(fn ($state) => !is_null($state)),
-            Select::make('prioridade_id')
-                ->options(function () {
-                    return \App\Models\Prioridade::all()->pluck('nome', 'id');
-                })
-                ->required()
-                ->default(1),
-        ]);
+            ->schema([
+                TextInput::make('nome')
+                    ->required()
+                    ->minLength(5)
+                    ->maxLength(50),
+                Textarea::make('descricao')
+                    ->maxLength(140)
+                    ->nullable(),
+                DateTimePicker::make('data_termino')
+                    ->nullable()
+                    ->disabled(fn($state) => !is_null($state)),
+                Select::make('prioridade_id')
+                    ->options(function () {
+                        return \App\Models\Prioridade::all()->pluck('nome', 'id');
+                    })
+                    ->required()
+                    ->default(1),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('nome')
+                    ->label('Nome'),
+                TextColumn::make('prioridade.nome')
+                    ->label('Prioridade'),
+                BooleanColumn::make('finalizada')
+                    ->label('Finalizada'),
             ])
+            ->modifyQueryUsing(function (Builder $query) {
+                return $query->where('user_id', Auth::id());
+            })
             ->filters([
                 //
             ])
