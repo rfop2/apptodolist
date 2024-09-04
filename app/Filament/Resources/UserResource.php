@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Hash;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\TextInput;
@@ -35,18 +36,21 @@ class UserResource extends Resource
                 TextInput::make('name')
                     ->required()
                     ->minLength(5)
-                    ->maxLength(50),
+                    ->maxLength(50)
+                    ->disabled(fn($record) => $record ? $record->id !== Auth::id() : false),
                 TextInput::make('email')
                     ->required()
                     ->email()
                     ->unique(ignoreRecord: true)
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('password')
+                    ->maxLength(255)
+                    ->disabled(fn($record) => $record ? $record->id !== Auth::id() : false),
+                TextInput::make('password')
                     ->password()
                     ->required(fn(string $operation): bool => $operation === 'create')
                     ->maxLength(255)
-                    ->dehydrated(fn(?string $state) => filled($state))
-                    ->visible(fn(string $operation): bool => $operation === 'create' || $operation === 'edit'),
+                    ->dehydrated(fn(?string $state) => filled($state) ? Hash::make($state) : null) // Only hash if not empty
+                    ->visible(fn(string $operation): bool => $operation === 'create' || $operation === 'edit')
+                    ->disabled(fn($record) => $record ? $record->id !== Auth::id() : false),
             ]);
     }
 
@@ -64,7 +68,7 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                ->visible(fn($record) => $record->id === Auth::id()), 
+                    ->visible(fn($record) => $record->id === Auth::id()),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([

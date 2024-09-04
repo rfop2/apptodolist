@@ -38,11 +38,11 @@ class TarefaResource extends Resource
                     ->required()
                     ->minLength(5)
                     ->maxLength(50)
-                    ->disabled(fn($record) => $record && $record->finalizada),
+                    ->disabled(fn($record) => $record ? ($record->finalizada || $record->user_id !== Auth::id()) : false),
                 Textarea::make('descricao')
                     ->maxLength(140)
                     ->nullable()
-                    ->disabled(fn($record) => $record && $record->finalizada),
+                    ->disabled(fn($record) => $record ? ($record->finalizada || $record->user_id !== Auth::id()) : false),
                 DateTimePicker::make('data_termino')
                     ->nullable()
                     ->disabled(),
@@ -51,11 +51,11 @@ class TarefaResource extends Resource
                         return \App\Models\Prioridade::all()->pluck('nome', 'id');
                     })
                     ->required()
-                    ->disabled(fn($record) => $record && $record->finalizada)
+                    ->disabled(fn($record) => $record ? ($record->finalizada || $record->user_id !== Auth::id()) : false)
                     ->default(1),
                 Checkbox::make('finalizada')
                     ->label('Finalizada')
-                    ->disabled(fn($record) => $record && $record->finalizada)
+                    ->disabled(fn($record) => $record ? ($record->finalizada || $record->user_id !== Auth::id()) : false)
                     ->visible(fn(string $operation): bool => $operation === 'edit')
             ]);
     }
@@ -76,7 +76,7 @@ class TarefaResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->visible(fn($record) => $record->user_id === Auth::id() && !$record->finalizada), 
+                    ->visible(fn($record) => $record->user_id === Auth::id() && !$record->finalizada),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
