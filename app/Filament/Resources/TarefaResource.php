@@ -71,19 +71,17 @@ class TarefaResource extends Resource
                 BooleanColumn::make('finalizada')
                     ->label('Finalizada'),
             ])
-            ->modifyQueryUsing(function (Builder $query) {
-                return $query->where('user_id', Auth::id());
-            })
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn($record) => $record->user_id === Auth::id()), 
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                // Tables\Actions\BulkActionGroup::make([
+                //     Tables\Actions\DeleteBulkAction::make(),
+                // ]),
             ]);
     }
 

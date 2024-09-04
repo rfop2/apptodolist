@@ -3,24 +3,13 @@
 namespace App\Filament\Resources\TarefaResource\Pages;
 
 use App\Filament\Resources\TarefaResource;
+use Auth;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditTarefa extends EditRecord
 {
     protected static string $resource = TarefaResource::class;
-    
-
-    protected function getActions(): array
-    {
-        $actions = parent::getActions();
-
-        if ($this->record && $this->record->finalizada) {
-            unset($actions['save']);
-        }
-
-        return $actions;
-    }
 
     protected function getRedirectUrl(): ?string
     {
@@ -30,7 +19,13 @@ class EditTarefa extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()->visible(fn($record) => $record->user_id === Auth::id()),
         ];
+    }
+
+    protected function getSaveFormAction(): Actions\Action
+    {
+        return parent::getSaveFormAction()
+            ->visible(fn($record) => $record->user_id === Auth::id());
     }
 }
