@@ -33,7 +33,8 @@ class Tarefa extends Model
         'data_termino' => 'datetime',
     ];
 
-    public function prioridade(){
+    public function prioridade()
+    {
         return $this->belongsTo(Prioridade::class);
     }
 
@@ -41,6 +42,12 @@ class Tarefa extends Model
     {
         static::creating(function ($tarefa) {
             $tarefa->user_id = Auth::id();
+        });
+
+        static::updating(function ($tarefa) {
+            if ($tarefa->finalizada) {
+                $tarefa->data_termino = now();
+            }
         });
     }
 }

@@ -21,6 +21,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\BooleanColumn;
 use Filament\Tables\Columns\DateColumn;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Forms\Components\Checkbox;
+
 
 class TarefaResource extends Resource
 {
@@ -35,19 +37,26 @@ class TarefaResource extends Resource
                 TextInput::make('nome')
                     ->required()
                     ->minLength(5)
-                    ->maxLength(50),
+                    ->maxLength(50)
+                    ->disabled(fn($record) => $record && $record->finalizada),
                 Textarea::make('descricao')
                     ->maxLength(140)
-                    ->nullable(),
+                    ->nullable()
+                    ->disabled(fn($record) => $record && $record->finalizada),
                 DateTimePicker::make('data_termino')
                     ->nullable()
-                    ->disabled(fn($state) => !is_null($state)),
+                    ->disabled(),
                 Select::make('prioridade_id')
                     ->options(function () {
                         return \App\Models\Prioridade::all()->pluck('nome', 'id');
                     })
                     ->required()
+                    ->disabled(fn($record) => $record && $record->finalizada)
                     ->default(1),
+                Checkbox::make('finalizada')
+                    ->label('Finalizada')
+                    ->disabled(fn($record) => $record && $record->finalizada)
+                    ->visible(fn(string $operation): bool => $operation === 'edit')
             ]);
     }
 
