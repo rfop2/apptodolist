@@ -19,13 +19,13 @@ class EditTarefa extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make()->visible(fn($record) => $record->user_id === Auth::id()),
+            Actions\DeleteAction::make()->visible(fn($record) => $record->user_id === Auth::id() && !$record->finalizada),
         ];
     }
 
     protected function getSaveFormAction(): Actions\Action
     {
         return parent::getSaveFormAction()
-            ->visible(fn($record) => $record->user_id === Auth::id());
+            ->visible(fn($record) => $record->user_id === Auth::id() && !$record->finalizada);
     }
 }

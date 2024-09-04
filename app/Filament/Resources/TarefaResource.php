@@ -76,7 +76,7 @@ class TarefaResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->visible(fn($record) => $record->user_id === Auth::id()), 
+                    ->visible(fn($record) => $record->user_id === Auth::id() && !$record->finalizada), 
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
